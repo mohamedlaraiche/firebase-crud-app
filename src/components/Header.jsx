@@ -26,23 +26,21 @@ const ColorButton = styled(Button)(({ theme }) => ({
     backgroundColor: blueGrey[700],
   },
 }));
-const Header = ({ users, setUsers }) => {
+const Header = ({ users, setUsers, id }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [id] = useState(uuidv4());
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const databases = collection(db, "users");
   const submitHandler = (e) => {
     e.preventDefault();
-    setUsers([...users, { id: uuidv4(), name: name, email: email }]);
-    addDoc(databases, { id, name, email })
+    setUsers([...users, { name: name, email: email }]);
+    addDoc(databases, { name, email })
       .then(swal("Good job!", "User has been added !", "success"))
       .catch((err) => swal(err.message));
     setOpen(false);
   };
-
   return (
     <>
       <Grid
@@ -95,7 +93,6 @@ const Header = ({ users, setUsers }) => {
               justifyContent: "center",
             }}
           >
-            <input type="text" value={id} hidden readOnly />
             <TextField
               style={{ width: "80%", margin: "15px" }}
               id="outlined-basic"

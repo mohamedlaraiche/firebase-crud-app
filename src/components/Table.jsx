@@ -16,7 +16,7 @@ import {
   Box,
 } from "@mui/material";
 import swal from "sweetalert";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
 const style = {
@@ -31,16 +31,23 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
-const TableContent = ({ users }) => {
+const TableContent = ({ users, setUsers, id }) => {
   const [datas, setDatas] = useState([]);
   const [open, setOpen] = useState(false);
-
   const handleClose = () => setOpen(false);
   const editHandler = () => {
     setOpen(true);
   };
-  const deleteHandler = () => {
-    swal({
+  const databases = collection(db, "users");
+
+  const deleteHandler = (ids) => {
+    const docRef = doc(databases, ids);
+    deleteDoc(docRef)
+      .then(() => {
+        console.log("doc deleted");
+      })
+      .catch((err) => console.log(err));
+    /** swal({
       title: "Are you sure?",
       text: "Once deleted, you will not be able to recover this imaginary file!",
       icon: "warning",
@@ -56,12 +63,12 @@ const TableContent = ({ users }) => {
         console.log("save");
         swal("Your imaginary file is safe!");
       }
-    });
+    });**/
   };
-  const databases = collection(db, "users");
   useEffect(() => {
     const getData = async () => {
       const data = await getDocs(databases);
+      console.log(data.temp1);
       setDatas(data.docs.map((doc) => doc.data()));
     };
     getData();
@@ -85,6 +92,8 @@ const TableContent = ({ users }) => {
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
+                  {" "}
+                  {data.id}
                   {data.name}
                 </TableCell>
                 <TableCell align="center"> {data.email} </TableCell>
@@ -95,7 +104,9 @@ const TableContent = ({ users }) => {
                 </TableCell>
                 <TableCell align="center">
                   <Button
-                    onClick={deleteHandler}
+                    onClick={() => {
+                      deleteHandler(data.id);
+                    }}
                     variant="contained"
                     color="error"
                   >
@@ -112,7 +123,10 @@ const TableContent = ({ users }) => {
                 <TableCell component="th" scope="row">
                   {user.name}
                 </TableCell>
-                <TableCell align="center"> {user.email} </TableCell>
+                <TableCell align="center">
+                  {" "}
+                  {user.id} {user.email}{" "}
+                </TableCell>
                 <TableCell align="center">
                   <Button onClick={editHandler} variant="contained">
                     Edit
@@ -120,7 +134,9 @@ const TableContent = ({ users }) => {
                 </TableCell>
                 <TableCell align="center">
                   <Button
-                    onClick={deleteHandler}
+                    onClick={() => {
+                      deleteHandler(user.id);
+                    }}
                     variant="contained"
                     color="error"
                   >
