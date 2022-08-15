@@ -10,6 +10,7 @@ import {
   Paper,
   Grid,
   Typography,
+  TextField,
   Modal,
   Box,
 } from "@mui/material";
@@ -123,37 +124,41 @@ const TableContent = () => {
             style={{
               display: "flex",
               flexDirection: "column",
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <input
-              style={{
-                margin: "10px",
-                padding: "10px",
-              }}
-              type="text"
-              placeholder="Name"
+            <TextField
+              style={{ width: "80%", margin: "15px" }}
+              id="outlined-basic"
+              label="Name"
+              variant="outlined"
               required
             />
-            <input
-              style={{
-                margin: "10px",
-                padding: "10px",
-              }}
+
+            <TextField
               type="email"
-              placeholder="Email"
+              style={{ width: "80%", margin: "15px" }}
+              id="outlined-basic"
+              label="Email"
+              variant="outlined"
               required
             />
+
             <input
               style={{
                 margin: "10px",
-                padding: "10px",
+                padding: "15px",
                 background: "#1976d2",
                 color: "#fff",
                 border: "none",
                 fontWeight: 600,
+                width: "40%",
+                borderRadius: "3px",
               }}
               type="submit"
-              value="Edit"
+              value="Add"
             />
           </form>
         </Box>

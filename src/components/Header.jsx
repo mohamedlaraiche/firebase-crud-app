@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Grid, Typography, Button, Modal, Box } from "@mui/material";
+import { Grid, Typography, Button, Modal, Box, TextField } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { blueGrey } from "@mui/material/colors";
 const style = {
@@ -72,34 +72,38 @@ const Header = () => {
             style={{
               display: "flex",
               flexDirection: "column",
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <input
-              style={{
-                margin: "10px",
-                padding: "10px",
-              }}
-              type="text"
-              placeholder="Name"
+            <TextField
+              style={{ width: "80%", margin: "15px" }}
+              id="outlined-basic"
+              label="Name"
+              variant="outlined"
               required
             />
-            <input
-              style={{
-                margin: "10px",
-                padding: "10px",
-              }}
+
+            <TextField
               type="email"
-              placeholder="Email"
+              style={{ width: "80%", margin: "15px" }}
+              id="outlined-basic"
+              label="Email"
+              variant="outlined"
               required
             />
+
             <input
               style={{
                 margin: "10px",
-                padding: "10px",
+                padding: "15px",
                 background: "#1976d2",
                 color: "#fff",
                 border: "none",
                 fontWeight: 600,
+                width: "40%",
+                borderRadius: "3px",
               }}
               type="submit"
               value="Add"
