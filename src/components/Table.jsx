@@ -1,4 +1,5 @@
-import { useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useState, useEffect } from "react";
 import {
   Button,
   Table,
@@ -15,6 +16,9 @@ import {
   Box,
 } from "@mui/material";
 import swal from "sweetalert";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebaseConfig";
+
 const style = {
   position: "absolute",
   top: "50%",
@@ -28,6 +32,7 @@ const style = {
   p: 4,
 };
 const TableContent = ({ users }) => {
+  const [datas, setDatas] = useState([]);
   const [open, setOpen] = useState(false);
 
   const handleClose = () => setOpen(false);
@@ -53,6 +58,14 @@ const TableContent = ({ users }) => {
       }
     });
   };
+  const databases = collection(db, "users");
+  useEffect(() => {
+    const getData = async () => {
+      const data = await getDocs(databases);
+      setDatas(data.docs.map((doc) => doc.data()));
+    };
+    getData();
+  }, []);
   return (
     <>
       <TableContainer component={Paper}>
@@ -66,6 +79,31 @@ const TableContent = ({ users }) => {
             </TableRow>
           </TableHead>
           <TableBody>
+            {datas.map((data) => (
+              <TableRow
+                key={data.id}
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              >
+                <TableCell component="th" scope="row">
+                  {data.name}
+                </TableCell>
+                <TableCell align="center"> {data.email} </TableCell>
+                <TableCell align="center">
+                  <Button onClick={editHandler} variant="contained">
+                    Edit
+                  </Button>
+                </TableCell>
+                <TableCell align="center">
+                  <Button
+                    onClick={deleteHandler}
+                    variant="contained"
+                    color="error"
+                  >
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
             {users.map((user) => (
               <TableRow
                 key={user.id}
