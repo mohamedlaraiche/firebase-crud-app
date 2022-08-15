@@ -27,7 +27,7 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
-const TableContent = () => {
+const TableContent = ({ users }) => {
   const [open, setOpen] = useState(false);
 
   const handleClose = () => setOpen(false);
@@ -66,29 +66,31 @@ const TableContent = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            <TableRow
-              key="name"
-              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                Mohamed Laraiche
-              </TableCell>
-              <TableCell align="center">laraiche@gmail.com</TableCell>
-              <TableCell align="center">
-                <Button onClick={editHandler} variant="contained">
-                  Edit
-                </Button>
-              </TableCell>
-              <TableCell align="center">
-                <Button
-                  onClick={deleteHandler}
-                  variant="contained"
-                  color="error"
-                >
-                  Delete
-                </Button>
-              </TableCell>
-            </TableRow>
+            {users.map((user) => (
+              <TableRow
+                key={user.id}
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              >
+                <TableCell component="th" scope="row">
+                  {user.name}
+                </TableCell>
+                <TableCell align="center"> {user.email} </TableCell>
+                <TableCell align="center">
+                  <Button onClick={editHandler} variant="contained">
+                    Edit
+                  </Button>
+                </TableCell>
+                <TableCell align="center">
+                  <Button
+                    onClick={deleteHandler}
+                    variant="contained"
+                    color="error"
+                  >
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>

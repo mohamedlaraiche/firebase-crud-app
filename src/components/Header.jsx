@@ -2,6 +2,10 @@ import { useState } from "react";
 import { Grid, Typography, Button, Modal, Box, TextField } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { blueGrey } from "@mui/material/colors";
+import { db } from "../firebaseConfig";
+import { collection, addDoc } from "firebase/firestore";
+import { v4 as uuidv4 } from "uuid";
+import swal from "sweetalert";
 const style = {
   position: "absolute",
   top: "50%",
@@ -22,10 +26,23 @@ const ColorButton = styled(Button)(({ theme }) => ({
     backgroundColor: blueGrey[700],
   },
 }));
-const Header = () => {
+const Header = ({ users, setUsers }) => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [id] = useState(uuidv4());
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const databases = collection(db, "users");
+  const submitHandler = (e) => {
+    e.preventDefault();
+    setUsers([...users, { id: uuidv4(), name: name, email: email }]);
+    addDoc(databases, { id, name, email })
+      .then(swal("Good job!", "User has been added !", "success"))
+      .catch((err) => swal(err.message));
+    setOpen(false);
+  };
+
   return (
     <>
       <Grid
@@ -69,6 +86,7 @@ const Header = () => {
             Add new user
           </Typography>
           <form
+            onSubmit={submitHandler}
             style={{
               display: "flex",
               flexDirection: "column",
@@ -77,12 +95,14 @@ const Header = () => {
               justifyContent: "center",
             }}
           >
+            <input type="text" value={id} hidden readOnly />
             <TextField
               style={{ width: "80%", margin: "15px" }}
               id="outlined-basic"
               label="Name"
               variant="outlined"
               required
+              onChange={(e) => setName(e.target.value)}
             />
 
             <TextField
@@ -92,6 +112,7 @@ const Header = () => {
               label="Email"
               variant="outlined"
               required
+              onChange={(e) => setEmail(e.target.value)}
             />
 
             <input
