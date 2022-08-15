@@ -1,0 +1,164 @@
+import { useState } from "react";
+import {
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Grid,
+  Typography,
+  Modal,
+  Box,
+} from "@mui/material";
+import swal from "sweetalert";
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  maxWidth: 700,
+  width: "80%",
+  height: "auto",
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+};
+const TableContent = () => {
+  const [open, setOpen] = useState(false);
+
+  const handleClose = () => setOpen(false);
+  const editHandler = () => {
+    setOpen(true);
+  };
+  const deleteHandler = () => {
+    swal({
+      title: "Are you sure?",
+      text: "Once deleted, you will not be able to recover this imaginary file!",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    }).then((willDelete) => {
+      if (willDelete) {
+        swal("Poof! Your imaginary file has been deleted!", {
+          icon: "success",
+        });
+        console.log("deleted");
+      } else {
+        console.log("save");
+        swal("Your imaginary file is safe!");
+      }
+    });
+  };
+  return (
+    <>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell align="center">Email</TableCell>
+              <TableCell align="center">Edit</TableCell>
+              <TableCell align="center">Delete</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow
+              key="name"
+              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+            >
+              <TableCell component="th" scope="row">
+                Mohamed Laraiche
+              </TableCell>
+              <TableCell align="center">laraiche@gmail.com</TableCell>
+              <TableCell align="center">
+                <Button onClick={editHandler} variant="contained">
+                  Edit
+                </Button>
+              </TableCell>
+              <TableCell align="center">
+                <Button
+                  onClick={deleteHandler}
+                  variant="contained"
+                  color="error"
+                >
+                  Delete
+                </Button>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <Modal
+        style={{ padding: "40px" }}
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Grid
+            style={{
+              display: "flex",
+              justifyContent: "flex-end  ",
+            }}
+            item
+          >
+            <Button variant="contained" onClick={handleClose}>
+              X
+            </Button>
+          </Grid>
+          <Typography
+            style={{ margin: "10px 0px 10px 10px" }}
+            id="modal-modal-title"
+            variant="h5"
+            component="h2"
+          >
+            Edit user
+          </Typography>
+          <form
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <input
+              style={{
+                margin: "10px",
+                padding: "10px",
+              }}
+              type="text"
+              placeholder="Name"
+              required
+            />
+            <input
+              style={{
+                margin: "10px",
+                padding: "10px",
+              }}
+              type="email"
+              placeholder="Email"
+              required
+            />
+            <input
+              style={{
+                margin: "10px",
+                padding: "10px",
+                background: "#1976d2",
+                color: "#fff",
+                border: "none",
+                fontWeight: 600,
+              }}
+              type="submit"
+              value="Edit"
+            />
+          </form>
+        </Box>
+      </Modal>
+    </>
+  );
+};
+export default TableContent;
