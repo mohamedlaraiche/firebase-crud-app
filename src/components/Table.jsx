@@ -15,6 +15,7 @@ import {
   Modal,
   Box,
 } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
 import swal from "sweetalert";
 import {
   collection,
@@ -37,11 +38,38 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
+function CircularProgressWithLabel(props) {
+  return (
+    <Box sx={{ position: "relative", display: "inline-flex" }}>
+      <CircularProgress variant="determinate" {...props} />
+      <Box
+        sx={{
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 0,
+          position: "absolute",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Typography
+          variant="caption"
+          component="div"
+          color="text.secondary"
+        >{`${Math.round(props.value)}%`}</Typography>
+      </Box>
+    </Box>
+  );
+}
+
 const TableContent = ({ users, setUsers, id }) => {
   const [datas, setDatas] = useState([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [ids, setIds] = useState("");
+  const [progress, setProgress] = useState(10);
   const [open, setOpen] = useState(false);
   const handleClose = () => setOpen(false);
 
@@ -93,56 +121,80 @@ const TableContent = ({ users, setUsers, id }) => {
       icon: "success",
     });
   };
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((prevProgress) =>
+        prevProgress === 100 ? 100 : prevProgress + 5
+      );
+    }, 200);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
 
   return (
     <>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell align="center">Email</TableCell>
-              <TableCell align="center">Edit</TableCell>
-              <TableCell align="center">Delete</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {datas.map((data) => (
-              <TableRow
-                key={data.id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {" "}
-                  {data.data.name}
-                </TableCell>
-                <TableCell align="center"> {data.data.email} </TableCell>
-                <TableCell align="center">
-                  <Button
-                    onClick={() => {
-                      editBtnHandler(data.id);
-                    }}
-                    variant="contained"
-                  >
-                    Edit
-                  </Button>
-                </TableCell>
-                <TableCell align="center">
-                  <Button
-                    onClick={() => {
-                      deleteHandler(data.id);
-                    }}
-                    variant="contained"
-                    color="error"
-                  >
-                    Delete
-                  </Button>
-                </TableCell>
+      {progress === 100 ? (
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell align="center">Email</TableCell>
+                <TableCell align="center">Edit</TableCell>
+                <TableCell align="center">Delete</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {datas.map((data) => (
+                <TableRow
+                  key={data.id}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {" "}
+                    {data.data.name}
+                  </TableCell>
+                  <TableCell align="center"> {data.data.email} </TableCell>
+                  <TableCell align="center">
+                    <Button
+                      onClick={() => {
+                        editBtnHandler(data.id);
+                      }}
+                      variant="contained"
+                    >
+                      Edit
+                    </Button>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Button
+                      onClick={() => {
+                        deleteHandler(data.id);
+                      }}
+                      variant="contained"
+                      color="error"
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      ) : (
+        <Grid
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
+            height: "60vh",
+          }}
+        >
+          <CircularProgressWithLabel value={progress} />
+        </Grid>
+      )}
 
       <Modal
         style={{ padding: "40px" }}
