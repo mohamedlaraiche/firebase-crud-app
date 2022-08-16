@@ -16,7 +16,13 @@ import {
   Box,
 } from "@mui/material";
 import swal from "sweetalert";
-import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  deleteDoc,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
 const style = {
@@ -33,21 +39,16 @@ const style = {
 };
 const TableContent = ({ users, setUsers, id }) => {
   const [datas, setDatas] = useState([]);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [ids, setIds] = useState("");
   const [open, setOpen] = useState(false);
   const handleClose = () => setOpen(false);
-  const editHandler = () => {
-    setOpen(true);
-  };
+
   const databases = collection(db, "users");
 
   const deleteHandler = (ids) => {
-    const docRef = doc(databases, ids);
-    deleteDoc(docRef)
-      .then(() => {
-        console.log("doc deleted");
-      })
-      .catch((err) => console.log(err));
-    /** swal({
+    swal({
       title: "Are you sure?",
       text: "Once deleted, you will not be able to recover this imaginary file!",
       icon: "warning",
@@ -58,21 +59,41 @@ const TableContent = ({ users, setUsers, id }) => {
         swal("Poof! Your imaginary file has been deleted!", {
           icon: "success",
         });
-        console.log("deleted");
+        const docRef = doc(databases, ids);
+        deleteDoc(docRef);
       } else {
-        console.log("save");
         swal("Your imaginary file is safe!");
       }
-    });**/
+    });
   };
+
   useEffect(() => {
-    const getData = async () => {
-      const data = await getDocs(databases);
-      console.log(data.temp1);
-      setDatas(data.docs.map((doc) => doc.data()));
+    const snap = onSnapshot(databases, (snapshot) => {
+      setDatas(
+        snapshot.docs.map((data) => ({
+          id: data.id,
+          data: data.data(),
+        }))
+      );
+    });
+    return () => {
+      snap();
     };
-    getData();
   }, []);
+
+  const editBtnHandler = (id) => {
+    setOpen(true);
+    setIds(id);
+  };
+  const updateData = (id) => {
+    const editRef = doc(db, "users", id);
+    updateDoc(editRef, { name, email });
+    setOpen(false);
+    swal("Poof! Your imaginary file has been Updated!", {
+      icon: "success",
+    });
+  };
+
   return (
     <>
       <TableContainer component={Paper}>
@@ -93,12 +114,16 @@ const TableContent = ({ users, setUsers, id }) => {
               >
                 <TableCell component="th" scope="row">
                   {" "}
-                  {data.id}
-                  {data.name}
+                  {data.data.name}
                 </TableCell>
-                <TableCell align="center"> {data.email} </TableCell>
+                <TableCell align="center"> {data.data.email} </TableCell>
                 <TableCell align="center">
-                  <Button onClick={editHandler} variant="contained">
+                  <Button
+                    onClick={() => {
+                      editBtnHandler(data.id);
+                    }}
+                    variant="contained"
+                  >
                     Edit
                   </Button>
                 </TableCell>
@@ -106,36 +131,6 @@ const TableContent = ({ users, setUsers, id }) => {
                   <Button
                     onClick={() => {
                       deleteHandler(data.id);
-                    }}
-                    variant="contained"
-                    color="error"
-                  >
-                    Delete
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-            {users.map((user) => (
-              <TableRow
-                key={user.id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {user.name}
-                </TableCell>
-                <TableCell align="center">
-                  {" "}
-                  {user.id} {user.email}{" "}
-                </TableCell>
-                <TableCell align="center">
-                  <Button onClick={editHandler} variant="contained">
-                    Edit
-                  </Button>
-                </TableCell>
-                <TableCell align="center">
-                  <Button
-                    onClick={() => {
-                      deleteHandler(user.id);
                     }}
                     variant="contained"
                     color="error"
@@ -177,6 +172,10 @@ const TableContent = ({ users, setUsers, id }) => {
             Edit user
           </Typography>
           <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              updateData(ids);
+            }}
             style={{
               display: "flex",
               flexDirection: "column",
@@ -185,12 +184,14 @@ const TableContent = ({ users, setUsers, id }) => {
               justifyContent: "center",
             }}
           >
+            <input type="text" value={ids} readOnly hidden />
             <TextField
               style={{ width: "80%", margin: "15px" }}
               id="outlined-basic"
               label="Name"
               variant="outlined"
               required
+              onChange={(e) => setName(e.target.value)}
             />
 
             <TextField
@@ -200,6 +201,7 @@ const TableContent = ({ users, setUsers, id }) => {
               label="Email"
               variant="outlined"
               required
+              onChange={(e) => setEmail(e.target.value)}
             />
 
             <input
@@ -214,7 +216,7 @@ const TableContent = ({ users, setUsers, id }) => {
                 borderRadius: "3px",
               }}
               type="submit"
-              value="Add"
+              value="Edit"
             />
           </form>
         </Box>
